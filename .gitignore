@@ -1,3 +1,5 @@
 .idea/
 packer_cache/
 VoightCentos7.iml
+builds/
+report/
