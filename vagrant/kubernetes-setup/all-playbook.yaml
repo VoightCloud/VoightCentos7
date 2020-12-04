@@ -11,16 +11,17 @@
   become: true
 
 - name: Start iptables
-  systemd:
+  service:
     name: iptables
     enabled: yes
     state: started
+  become: true
 
 - name: Add repository
   yum_repository:
     name: docker
     description: Docker repo
-    baseurl: https://docs.docker.com/engine/installation/linux/repo_files/centos/docker.repo
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
   become: true
 
 - name: Install kubernetes repo
@@ -30,20 +31,24 @@
   become: true
 
 - name: Install docker engine
-  become: true
   yum:
-    name: docker-engine
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+  become: true
 
 - name: Enable docker
-  become: true
-  service:
+  systemctl:
     name: docker
-    state: restarted
+    enabled: yes
+    state: started
+  become: true
 
 - name: Install curl
-  become: true
   yum:
     name: curl
+  become: true
 
 - name: Remove swapfile from /etc/fstab
   become: true
