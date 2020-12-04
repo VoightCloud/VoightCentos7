@@ -1,0 +1,15 @@
+# Derived from https://github.com/helm/charts/tree/master/stable/metallb
+
+# configInline specifies MetalLB's configuration directly, in yaml
+# format. When configInline is used, Helm manages MetalLB's
+# configuration ConfigMap as part of the release, and
+# existingConfigMap is ignored.
+#
+# Refer to https://metallb.universe.tf/configuration/ for
+# available options.
+configInline:
+  address-pools:
+  - name: default
+    protocol: layer2
+    addresses:
+      - 192.168.137.210-192.168.137.230

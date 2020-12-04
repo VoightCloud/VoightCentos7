@@ -1,0 +1,147 @@
+- name: Initialize Kubernetes Control Plane
+  hosts: all
+  tasks:
+    - name: Common Tasks
+      include_tasks: all-playbook.yaml
+
+    - name: Initialize firewalld
+      command: "{{ item }}"
+      with_items:
+        - firewall-cmd --permanent --add-port=6443/tcp
+        - firewall-cmd --permanent --add-port=2379-2380/tcp
+        - firewall-cmd --permanent --add-port=10250/tcp
+        - firewall-cmd --permanent --add-port=10251/tcp
+        - firewall-cmd --permanent --add-port=10252/tcp
+        - firewall-cmd --permanent --add-port=10255/tcp
+        - firewall-cmd --reload
+      become: true
+
+    - name: Initialize the Kubernetes cluster using kubeadm
+      become: true
+      command: kubeadm init --pod-network-cidr=100.64.0.0/16 --service-cidr=100.65.0.0/16
+
+
+
+    - name: Create .kube directory for ubuntu
+      file:
+        path: /home/centos/.kube
+        state: directory
+        owner: centos
+        group: centos
+        mode: '0700'
+
+    - name: Copy kubeconfig
+      become: true
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/centos/.kube/config
+        remote_src: yes
+        owner: centos
+        group: centos
+        mode: '0700'
+
+    - name: Get Helm
+      become: true
+      unarchive:
+        remote_src: yes
+        src: https://get.helm.sh/helm-v3.3.4-linux-arm64.tar.gz
+        dest: ~/
+      when: ansible_architecture == "x86_64"
+
+    - name: Get Helm
+      become: true
+      unarchive:
+        remote_src: yes
+        src: https://get.helm.sh/helm-v3.3.4-linux-arm64.tar.gz
+        dest: ~/
+      when: ansible_architecture == "aarch64"
+
+    - name: Move Helm package
+      command: "{{ item }}"
+      become: true
+      when: ansible_architecture == "aarch64"
+      args:
+        warn: false
+      with_items:
+        - mv ~/linux-arm64/helm /usr/local/bin/helm
+        - rm -r ~/linux-arm64/
+
+    - name: Move Helm package
+      command: "{{ item }}"
+      become: true
+      when: ansible_architecture == "x86_64"
+      args:
+        warn: false
+      with_items:
+        - mv ~/linux-amd64/helm /usr/local/bin/helm
+        - rm -r ~/linux-amd64/
+
+    - name: Install bitnami repos
+      community.kubernetes.helm_repository:
+        name: bitnami
+        repo_url: "https://charts.bitnami.com/bitnami"
+
+    - name: Install stable repos
+      community.kubernetes.helm_repository:
+        name: stable
+        repo_url: "https://kubernetes-charts.storage.googleapis.com"
+
+    - name: Install oteemocharts repos
+      community.kubernetes.helm_repository:
+        name: oteemocharts
+        repo_url: "https://oteemo.github.io/charts"
+
+    - name: Install elastic repos
+      community.kubernetes.helm_repository:
+        name: elastic
+        repo_url: "https://helm.elastic.co"
+
+    - name: Install dashboard repos
+      community.kubernetes.helm_repository:
+        name: kubernetes-dashboard
+        repo_url: "https://kubernetes.github.io/dashboard"
+
+    - name: Install jenkins repos
+      community.kubernetes.helm_repository:
+        name: jenkins
+        repo_url: "https://charts.jenkins.io"
+
+    - name: Install hashicorp repos
+      community.kubernetes.helm_repository:
+        name: hashicorp
+        repo_url: "https://helm.releases.hashicorp.com"
+
+    - name: Install NextCloud repos
+      community.kubernetes.helm_repository:
+        name: nextcloud
+        repo_url: "https://nextcloud.github.io/helm/"
+
+    - name: Install cetic repos
+      community.kubernetes.helm_repository:
+        name: cetic
+        repo_url: "https://cetic.github.io/helm-charts"
+
+    - name: Install haproxy repos
+      community.kubernetes.helm_repository:
+        name: haproxy
+        repo_url: "https://haproxytech.github.io/helm-charts"
+
+    - name: Update helm repos
+      command: helm repo update
+
+    - name: Install flannel
+      command: "{{ item }}"
+      with_items:
+        - kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml -f ./kubernetes/flannel-values.yaml
+        - kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+
+    - name: Install Metal-LB
+      command: helm install -n default metallb stable/metallb -f ./kubernetes/metallb-values.yaml
+
+    - name: Install namespaces
+      command: kubectl apply -f ./kubernetes/namespaces.yaml
+
+    - name: Create NFS Share Directory
+      file:
+        path: /volume
+        state: directory

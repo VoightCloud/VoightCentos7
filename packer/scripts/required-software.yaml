@@ -27,7 +27,14 @@
           - clamd
           - clamav-update
           - clamav-data
+          - setroubleshoot
+          - setroubleshoot-server
         update_cache: true
+
+    - name:
+        service:
+          name: auditd
+          state: restarted
 
     - name: Unzip Security Guide
       unarchive:

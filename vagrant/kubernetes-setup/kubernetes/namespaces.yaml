@@ -1,0 +1,29 @@
+# Namespaces
+# devops, monitoring, blue, green, prod
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devops
+  labels:
+    name: devops
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blue
+  labels:
+    name: blue
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: green
+  labels:
+    name: green
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+  labels:
+    name: prod
