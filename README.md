@@ -13,7 +13,7 @@ https://github.com/ComplianceAsCode/content/releases/download/v0.1.53/scap-secur
 
 * In vagrant/kubernetes-setup/kubernetes/nas-values.yaml change the NFS address to your master node address (from the Vagrantfile).
 
-* In vagrant/kubernetes-setup/kubernetes/flannel-values, replace all occurrences of 192.168.137.x to your own local network (again, probably 192.168.0.x)
+* In vagrant/kubernetes-setup/kubernetes/metallb-values.yaml, replace all occurrences of 192.168.137.x to your own local network (again, probably 192.168.0.x)
 
 * In vagrant/kubernetes-setup/controlplane-playbook.yaml, look for the exports file and update the network address to your own local network (see above).
 
