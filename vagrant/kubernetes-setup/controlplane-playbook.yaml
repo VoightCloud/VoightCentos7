@@ -33,6 +33,11 @@
     - name: Initialize the Kubernetes cluster using kubeadm
       become: true
       command: kubeadm init --pod-network-cidr=100.64.0.0/16 --service-cidr=100.65.0.0/16
+      register: join_command
+
+    - name: Copy join command to local file
+      become: false
+      local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./tmpfiles/join-command"
 
     - name: Create .kube directory for ubuntu
       file:
@@ -94,7 +99,7 @@
     - name: Install stable repos
       community.kubernetes.helm_repository:
         name: stable
-        repo_url: "https://kubernetes-charts.storage.googleapis.com"
+        repo_url: "https://charts.helm.sh/stable"
 
     - name: Install oteemocharts repos
       community.kubernetes.helm_repository:
@@ -140,7 +145,7 @@
       command: helm repo update
 
     - name: Copy kubernetes yaml
-      file:
+      copy:
         src: ./kubernetes
         dest: /tmp
 

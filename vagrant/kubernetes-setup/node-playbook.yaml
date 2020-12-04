@@ -3,3 +3,4 @@
   tasks:
     - name: Common Tasks
       include_tasks: all-playbook.yaml
+
