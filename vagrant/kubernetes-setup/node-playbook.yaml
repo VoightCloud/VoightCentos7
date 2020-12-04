@@ -9,3 +9,4 @@
 
     - name: Join the node to cluster
       command: sh /home/centos/join-command.sh
+      become: true
