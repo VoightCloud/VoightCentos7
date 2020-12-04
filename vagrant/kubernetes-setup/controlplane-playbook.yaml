@@ -24,7 +24,7 @@
       become: true
       lineinfile:
         path: /etc/exports
-        line: '/volume           192.168.137.0/24(rw,sync,no_root_squash,no_subtree_check)'
+        line: '/volume           192.168.50.0/24(rw,sync,no_root_squash,no_subtree_check)'
 
     - name: Export volume
       command: exportfs -a
@@ -33,7 +33,7 @@
     - name: Initialize the Kubernetes cluster using kubeadm
       become: true
       command: >
-        kubeadm init --apiserver-advertise-address="192.168.137.210" --apiserver-cert-extra-sans="192.168.137.210"
+        kubeadm init --apiserver-advertise-address="192.168.50.210" --apiserver-cert-extra-sans="192.168.50.210"
         --pod-network-cidr=100.64.0.0/16 --service-cidr=100.65.0.0/16
 
     - name: Generate join command
