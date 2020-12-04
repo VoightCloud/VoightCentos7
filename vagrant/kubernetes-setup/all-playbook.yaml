@@ -17,11 +17,10 @@
     state: started
   become: true
 
-- name: Add repository
-  yum_repository:
-    name: docker
-    description: Docker repo
-    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+- name: Install docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/
   become: true
 
 - name: Install kubernetes repo
