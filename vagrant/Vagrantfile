@@ -1,5 +1,5 @@
-IMAGE_NAME = "voight/centos7-x86-64.box"
-IMAGE_URL = "http://nexus.voight.org:8081/repository/MachineImages/gold/centos/centos7-x86-64.box"
+IMAGE_NAME = "voight/centos-7.9-x86_64.box"
+IMAGE_URL = "http://nexus.voight.org:8081/repository/MachineImages/gold/centos/centos-7.9-x86_64.box"
 N = 2
 
 Vagrant.configure("2") do |config|
