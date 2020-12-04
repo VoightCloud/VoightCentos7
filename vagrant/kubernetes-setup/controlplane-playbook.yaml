@@ -24,7 +24,7 @@
       become: true
       lineinfile:
         path: /etc/exports
-        line: '/volume           192.168.137/24(rw,sync,no_root_squash,no_subtree_check)'
+        line: '/volume           192.168.137.0/24(rw,sync,no_root_squash,no_subtree_check)'
 
     - name: Export volume
       command: exportfs -a
