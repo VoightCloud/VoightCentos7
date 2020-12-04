@@ -46,16 +46,21 @@
         - 10256
         - 9099
         - 2049
+        - 6783
+        - 6784
       become: true
 
     - name: Insert a rule on line 1
       iptables:
         chain: INPUT
         protocol: udp
-        destination_port: 8472
+        destination_port: "{{ item }}"
         jump: ACCEPT
         action: insert
         rule_num: 1
+      with_items:
+        - 8472
+        - 8285
       become: true
 
     - name: Initialize the Kubernetes cluster using kubeadm

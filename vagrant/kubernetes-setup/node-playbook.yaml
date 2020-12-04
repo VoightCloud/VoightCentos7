@@ -4,6 +4,35 @@
     - name: Common Tasks
       include_tasks: all-playbook.yaml
 
+    - name: Insert a rule on line 1
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "{{ item }}"
+        jump: ACCEPT
+        action: insert
+        rule_num: 1
+      with_items:
+        - 10250
+        - 10255
+        - 30000-32767
+        - 6783
+        - 6784
+      become: true
+
+    - name: Insert a rule on line 1
+      iptables:
+        chain: INPUT
+        protocol: udp
+        destination_port: "{{ item }}"
+        jump: ACCEPT
+        action: insert
+        rule_num: 1
+      with_items:
+        - 8472
+        - 8285
+      become: true
+
     - name: Copy the join command to server location
       copy: src=./tmpfiles/join-command dest=/home/centos/join-command.sh mode=0777
 
