@@ -4,23 +4,34 @@
     - name: Common Tasks
       include_tasks: all-playbook.yaml
 
-    - name: Initialize firewalld
-      command: "{{ item }}"
-      with_items:
-        - firewall-cmd --permanent --add-port=6443/tcp
-        - firewall-cmd --permanent --add-port=2379-2380/tcp
-        - firewall-cmd --permanent --add-port=10250/tcp
-        - firewall-cmd --permanent --add-port=10251/tcp
-        - firewall-cmd --permanent --add-port=10252/tcp
-        - firewall-cmd --permanent --add-port=10255/tcp
-        - firewall-cmd --reload
+    - name: Enable NFS
+      systemd:
+        name: nfs-server
+        enabled: yes
+        state: started
+
+    - name: Create NFS Share Directory
+      file:
+        path: /volume
+        state: directory
+        owner: nfsnobody
+        group: nfsnobody
+        mode: 755
+      become: true
+
+    - name: Update exports
+      become: true
+      lineinfile:
+        path: /etc/exports
+        line: '/volume           192.168.50.0/24(rw,sync,no_root_squash,no_subtree_check)'
+
+    - name: Export volume
+      command: exportfs -a
       become: true
 
     - name: Initialize the Kubernetes cluster using kubeadm
       become: true
       command: kubeadm init --pod-network-cidr=100.64.0.0/16 --service-cidr=100.65.0.0/16
-
-
 
     - name: Create .kube directory for ubuntu
       file:
@@ -141,7 +152,3 @@
     - name: Install namespaces
       command: kubectl apply -f ./kubernetes/namespaces.yaml
 
-    - name: Create NFS Share Directory
-      file:
-        path: /volume
-        state: directory

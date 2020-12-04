@@ -14,7 +14,7 @@ image:
 
 nfs:
   server: 192.168.50.10
-  path: /volume1/bucket/dynamic
+  path: /volume
   mountOptions:
 
 # For creating the StorageClass automatically:
