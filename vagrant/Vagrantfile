@@ -1,5 +1,6 @@
 IMAGE_NAME = "voight/centos-7.9-x86_64.box"
 IMAGE_URL = "http://nexus.voight.org:8081/repository/MachineImages/gold/centos/centos-7.9-x86_64.box"
+#IMAGE_URL = "https://nexus.dhsice.name/repository/STIG/boxes/centos-7.9-x86_64.box"
 N = 2
 
 Vagrant.configure("2") do |config|
@@ -14,7 +15,8 @@ Vagrant.configure("2") do |config|
     config.vm.define "k8s-master" do |master|
         master.vm.box = IMAGE_NAME
         master.vm.box_url = IMAGE_URL
-        master.vm.network "private_network", bridge: "enp6s0", ip: "192.168.50.210"
+        master.vm.network "private_network", ip: "192.168.50.210",
+            virtualbox__intnet: true
         master.vm.hostname = "k8s-master"
         master.vm.provision "ansible" do |ansible|
             ansible.playbook = "kubernetes-setup/controlplane-playbook.yaml"
@@ -28,7 +30,8 @@ Vagrant.configure("2") do |config|
         config.vm.define "node-#{i}" do |node|
             node.vm.box = IMAGE_NAME
             node.vm.box_url = IMAGE_URL
-            node.vm.network "private_network", bridge: "enp6s0", ip: "192.168.50.#{i + 210}"
+            node.vm.network "private_network", ip: "192.168.50.#{i + 210}",
+                virtualbox__intnet: true
             node.vm.hostname = "node-#{i}"
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "kubernetes-setup/node-playbook.yaml"
@@ -42,7 +45,8 @@ Vagrant.configure("2") do |config|
             config.vm.define "node-#{i}" do |node|
                 node.vm.box = IMAGE_NAME
                 node.vm.box_url = IMAGE_URL
-                node.vm.network "private_network", bridge: "enp6s0", ip: "192.168.50.#{i + 210}"
+                node.vm.network "private_network", bridge: "enp6s0", ip: "192.168.50.#{i + 210}",
+                    virtualbox__intnet: true
                 node.vm.hostname = "node-#{i}"
         end
     end
