@@ -55,7 +55,7 @@
     - name: Get Helm
       unarchive:
         remote_src: yes
-        src: https://get.helm.sh/helm-v3.3.4-linux-arm64.tar.gz
+        src: https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz
         dest: /home/centos/
       when: ansible_architecture == "x86_64"
 
