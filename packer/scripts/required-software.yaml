@@ -31,10 +31,11 @@
           - setroubleshoot-server
         update_cache: true
 
-    - name:
+    - name: Auditd enable
       systemd:
         name: auditd
-        state: restarted
+        enabled: yes
+        state: started
       become: true
 
     - name: Unzip Security Guide

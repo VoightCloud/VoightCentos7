@@ -6,13 +6,15 @@
 - name: Stop Firewalld
   systemd:
     name: firewalld
-    state: [stopped, disabled ]
+    enabled: no
+    state: stopped
   become: true
 
 - name: Start iptables
   systemd:
     name: iptables
-    state: [enabled, started]
+    enabled: yes
+    state: started
 
 - name: Add repository
   yum_repository:
