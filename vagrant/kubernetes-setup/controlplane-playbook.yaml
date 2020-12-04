@@ -53,19 +53,17 @@
         mode: '0700'
 
     - name: Get Helm
-      become: true
       unarchive:
         remote_src: yes
         src: https://get.helm.sh/helm-v3.3.4-linux-arm64.tar.gz
-        dest: ~/
+        dest: /home/centos/
       when: ansible_architecture == "x86_64"
 
     - name: Get Helm
-      become: true
       unarchive:
         remote_src: yes
         src: https://get.helm.sh/helm-v3.3.4-linux-arm64.tar.gz
-        dest: ~/
+        dest: /home/centos/
       when: ansible_architecture == "aarch64"
 
     - name: Move Helm package
@@ -75,8 +73,8 @@
       args:
         warn: false
       with_items:
-        - mv ~/linux-arm64/helm /usr/local/bin/helm
-        - rm -r ~/linux-arm64/
+        - mv /home/centos/linux-arm64/helm /usr/local/bin/helm
+        - rm -r /home/centos/linux-arm64/
 
     - name: Move Helm package
       command: "{{ item }}"
@@ -85,8 +83,8 @@
       args:
         warn: false
       with_items:
-        - mv ~/linux-amd64/helm /usr/local/bin/helm
-        - rm -r ~/linux-amd64/
+        - mv /home/centos/linux-amd64/helm /usr/local/bin/helm
+        - rm -r /home/centos/linux-amd64/
 
     - name: Install bitnami repos
       community.kubernetes.helm_repository:
