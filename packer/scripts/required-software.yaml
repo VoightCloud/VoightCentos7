@@ -32,9 +32,9 @@
         update_cache: true
 
     - name:
-        service:
-          name: auditd
-          state: restarted
+      service:
+        name: auditd
+        state: restarted
 
     - name: Unzip Security Guide
       unarchive:
