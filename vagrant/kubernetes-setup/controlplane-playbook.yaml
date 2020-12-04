@@ -30,6 +30,34 @@
       command: exportfs -a
       become: true
 
+    - name: Insert a rule on line 1
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: "{{ item }}"
+        jump: ACCEPT
+        action: insert
+        rule_num: 1
+      with_items:
+        - 6443
+        - 4149
+        - 10250
+        - 10255
+        - 10256
+        - 9099
+        - 2049
+      become: true
+
+    - name: Insert a rule on line 1
+      iptables:
+        chain: INPUT
+        protocol: udp
+        destination_port: 8472
+        jump: ACCEPT
+        action: insert
+        rule_num: 1
+      become: true
+
     - name: Initialize the Kubernetes cluster using kubeadm
       become: true
       command: >
