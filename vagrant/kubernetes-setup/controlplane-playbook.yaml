@@ -9,6 +9,7 @@
         name: nfs-server
         enabled: yes
         state: started
+      become: true
 
     - name: Create NFS Share Directory
       file:
