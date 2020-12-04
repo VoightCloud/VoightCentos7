@@ -4,4 +4,4 @@ VoightCentos7.iml
 builds/
 report/
 .vagrant/
-/vagrant/kubernetes-setup/tmpfiles/
+/vagrant/kubernetes-setup/tmpfiles/join-command
