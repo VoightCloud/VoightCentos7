@@ -33,6 +33,9 @@
     - name: Initialize the Kubernetes cluster using kubeadm
       become: true
       command: kubeadm init --pod-network-cidr=100.64.0.0/16 --service-cidr=100.65.0.0/16
+
+    name: Generate join command
+      command: kubeadm token create --print-join-command
       register: join_command
 
     - name: Copy join command to local file
