@@ -17,7 +17,7 @@
         state: directory
         owner: nfsnobody
         group: nfsnobody
-        mode: 755
+        mode: 0755
       become: true
 
     - name: Update exports
