@@ -1,0 +1,141 @@
+- name: Install required software
+  hosts: all
+  become: true
+
+  vars:
+    elasticpass: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      33393635336130333132656462323365306566613530666566313430323365363733303063323539
+      3633343461643831656130383436393662356438646464610a346233386266646438616264616161
+      38653364343239343338343037346231306664313130666363333331653462383431613131643237
+      6533386162393162300a316234333731336232363332393761663835626532356662663334623062
+      6562
+
+  tasks:
+    - name: Install stig
+      command: ansible-galaxy install redhatofficial.rhel7_stig
+
+    - name: Add repository
+      yum_repository:
+        name: td-agent-bit
+        description: TD Agent Bit
+        baseurl: https://packages.fluentbit.io/centos/7/$basearch/
+        gpgkey: https://packages.fluentbit.io/fluentbit.key
+
+    - name: Install TD-Agent-Bit
+      yum:
+        name:
+          - td-agent-bit
+
+    - name: Update TD-Agent-Bit Configuration
+      blockinfile:
+        path: /etc/td-agent-bit/td-agent-bit.conf
+        marker: "# {mark} ANSIBLE-MANAGED BLOCK"
+        marker_begin: "TD-Agent Begin"
+        marker_end: "TD-Agent End"
+        block: |
+          [INPUT]
+              name cpu
+              tag  cpu.local
+              interval_sec 10
+
+          [INPUT]
+              name mem
+              tag mem.local
+              interval_sec 10
+
+          [INPUT]
+              name tail
+              path /var/log/messages
+              tag logs.local
+
+          [FILTER]
+              name modify
+              match cpu*
+              Remove_regex cpu\d+.*
+              Add hostname ${HOSTNAME}
+
+          [FILTER]
+              name modify
+              match mem*
+              Add hostname ${HOSTNAME}
+
+          [FILTER]
+              name modify
+              match logs*
+              Add hostname ${HOSTNAME}
+
+          [OUTPUT]
+              name            es
+              Match           *
+              Host            10.0.3.16
+              Port            9200
+              Logstash_Format On
+              Retry_limit     False
+              Type            flb_type
+              Time_Key        @timestamp
+              Replace_Dots    On
+              Logstash_Prefix hosts
+              HTTP_User       elastic
+              HTTP_Passwd     {{ elasticpass }}
+
+    - name: Enable TD-Agent-Bit
+      systemd:
+        name: "td-agent-bit"
+        enabled: yes
+        state: started
+
+    - name: Install Software Packages
+      yum:
+        name:
+          - wget
+          - unzip
+          - openscap-scanner
+          - scap-security-guide
+          - firewalld
+          - clamav
+          - clamd
+          - clamav-update
+          - clamav-data
+        update_cache: true
+
+    - name: Unzip Security Guide
+      unarchive:
+        src: http://nexus.voight.org:8081/repository/STIG/rhel7/scap-security-guide-0.1.53.zip
+        dest: /home/centos
+        remote_src: yes
+
+    - name: ClamAV Log Directory
+      file:
+        path: /var/log/clamav
+        state: directory
+        owner: clamscan
+        group: clamscan
+
+    - name: Enable ClamAV Logging
+      lineinfile:
+        path: /etc/clamd.d/scan.conf
+        regexp: "^#LogFile /var/log/clamd.scan"
+        line: "LogFile /var/log/clamav/clamd.scan"
+
+    - name: Enable ClamAV Local Socket
+      lineinfile:
+        path: /etc/clamd.d/scan.conf
+        regexp: "^#LocalSocket"
+        line: "LocalSocket /run/clamd.scan/clamd.sock"
+
+    - name: Update ClamAV Database
+      command: freshclam
+
+    - name: Enable ClamAV Services
+      systemd:
+        name: "clamav-freshclam"
+        enabled: yes
+        state: started
+
+    - name: Enable ClamD Services
+      systemd:
+        name: "clamd@scan"
+        enabled: yes
+        state: started
+

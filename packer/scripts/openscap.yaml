@@ -1,0 +1,24 @@
+- name: OpenSCAP
+  hosts: all
+  become: true
+  vars:
+
+  tasks:
+    - name: STIG
+      command: bash /home/centos/scap-security-guide-0.1.53/bash/centos7-script-standard.sh
+      # command: bash /home/centos/scap-security-guide-0.1.53/bash/rhel7-script-stig.sh
+      #command: ansible-playbook -c local -i localhost /home/centos/scap-security-guide-0.1.53/ansible/rhel7-playbook-stig.yml
+
+    - name: Open Vulnerabilities Scan
+      command: >
+        oscap oval eval
+        --results /tmp/rhsa-results-oval.xml
+        --report /tmp/oval-report.html /home/centos/scap-security-guide-0.1.53/ssg-centos7-ds-1.2.xml
+      ignore_errors: true
+
+    - name: Inventory Scan
+      command: >
+        oscap xccdf eval --profile xccdf_org.ssgproject.content_profile_standard
+        --results-arf /tmp/rhsa-results-oval.xml
+        --report /tmp/cis-report.html /home/centos/scap-security-guide-0.1.53/ssg-centos7-ds-1.2.xml
+      ignore_errors: true
