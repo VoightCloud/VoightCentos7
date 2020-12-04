@@ -13,7 +13,7 @@ image:
   pullPolicy: IfNotPresent
 
 nfs:
-  server: 192.168.137.200
+  server: 192.168.137.210
   path: /volume
   mountOptions:
 
