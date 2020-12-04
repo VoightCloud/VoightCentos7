@@ -39,7 +39,7 @@
   become: true
 
 - name: Enable docker
-  systemctl:
+  systemd:
     name: docker
     enabled: yes
     state: started
