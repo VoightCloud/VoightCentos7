@@ -1,4 +1,7 @@
 # goldcent7
+On Windows
+vagrant plugin install vagrant-vbguest
+vagrant vbguest --do install --no-cleanup
 
 To make this work locally, you'll need to change some urls and addresses.
 ### CREATE A NEW BRANCH!
