@@ -1,9 +1,24 @@
-- name: Initialize firewalld
-  command: {{ item }}
-  with_items:
-    - firewall-cmd --permanent --add-port=10251/tcp
-    - firewall-cmd --permanent --add-port=10255/tcp
-    - firewall-cmd --reload
+- name: Install iptables
+  yum:
+    name: iptables-services.x86_64
+  become: true
+
+- name: Stop Firewalld
+  systemd:
+    name: firewalld
+    state: [stopped, disabled ]
+  become: true
+
+- name: Start iptables
+  systemd:
+    name: iptables
+    state: [enabled, started]
+
+- name: Add repository
+  yum_repository:
+    name: docker
+    description: Docker repo
+    baseurl: https://docs.docker.com/engine/installation/linux/repo_files/centos/docker.repo
   become: true
 
 - name: Install kubernetes repo
@@ -12,17 +27,21 @@
     dest: /etc/yum.repos.d/
   become: true
 
-- name: Install docker.io
+- name: Install docker engine
   become: true
-  apt: name=docker.io update_cache=yes
+  yum:
+    name: docker-engine
 
 - name: Enable docker
   become: true
-  service: name=docker state=restarted
+  service:
+    name: docker
+    state: restarted
 
 - name: Install curl
   become: true
-  apt: name=curl
+  yum:
+    name: curl
 
 - name: Remove swapfile from /etc/fstab
   become: true

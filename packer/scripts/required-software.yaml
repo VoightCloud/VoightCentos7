@@ -32,9 +32,10 @@
         update_cache: true
 
     - name:
-      service:
+      systemd:
         name: auditd
         state: restarted
+      become: true
 
     - name: Unzip Security Guide
       unarchive:
