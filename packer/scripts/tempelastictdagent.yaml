@@ -1,0 +1,70 @@
+
+- name: Add repository
+  yum_repository:
+    name: td-agent-bit
+    description: TD Agent Bit
+    baseurl: https://packages.fluentbit.io/centos/7/$basearch/
+    gpgkey: https://packages.fluentbit.io/fluentbit.key
+
+- name: Install TD-Agent-Bit
+  yum:
+    name:
+      - td-agent-bit
+
+- name: Update TD-Agent-Bit Configuration
+  blockinfile:
+    path: /etc/td-agent-bit/td-agent-bit.conf
+    marker: "# {mark} ANSIBLE-MANAGED BLOCK"
+    marker_begin: "TD-Agent Begin"
+    marker_end: "TD-Agent End"
+    block: |
+      [INPUT]
+          name cpu
+          tag  cpu.local
+          interval_sec 10
+
+      [INPUT]
+          name mem
+          tag mem.local
+          interval_sec 10
+
+      [INPUT]
+          name tail
+          path /var/log/messages
+          tag logs.local
+
+      [FILTER]
+          name modify
+          match cpu*
+          Remove_regex cpu\d+.*
+          Add hostname ${HOSTNAME}
+
+      [FILTER]
+          name modify
+          match mem*
+          Add hostname ${HOSTNAME}
+
+      [FILTER]
+          name modify
+          match logs*
+          Add hostname ${HOSTNAME}
+
+      [OUTPUT]
+          name            es
+          Match           *
+          Host            10.0.3.16
+          Port            9200
+          Logstash_Format On
+          Retry_limit     False
+          Type            flb_type
+          Time_Key        @timestamp
+          Replace_Dots    On
+          Logstash_Prefix hosts
+          HTTP_User       elastic
+          HTTP_Passwd     {{ elasticpass }}
+
+- name: Enable TD-Agent-Bit
+  systemd:
+    name: "td-agent-bit"
+    enabled: yes
+    state: started
