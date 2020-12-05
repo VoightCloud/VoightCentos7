@@ -48,6 +48,8 @@
         - 2049
         - 6783
         - 6784
+        - 2379:2380
+
       become: true
 
     - name: Insert a rule on line 1
