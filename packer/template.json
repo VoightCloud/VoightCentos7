@@ -19,7 +19,7 @@
       "output_directory": "./builds",
       "vm_name": "{{user `vmname`}}",
       "guest_os_type": "RedHat_64",
-      "disk_size": "24576",
+      "disk_size": "30720",
       "memory": "8192",
       "boot_wait": "10s",
       "http_directory": "http",

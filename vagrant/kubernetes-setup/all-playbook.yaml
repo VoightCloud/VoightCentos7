@@ -82,9 +82,16 @@
       - kubectl
       - nfs-utils
 
+- name: Configure node ip
+  become: true
+  lineinfile:
+    path: /etc/sysconfig/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
+
 - name: Restart kubelet
   become: true
   service:
     name: kubelet
     daemon_reload: yes
+    enabled: yes
     state: restarted

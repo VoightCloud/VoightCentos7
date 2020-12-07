@@ -17,14 +17,14 @@
         state: directory
         owner: nfsnobody
         group: nfsnobody
-        mode: 0755
+        mode: 0777
       become: true
 
     - name: Update exports
       become: true
       lineinfile:
         path: /etc/exports
-        line: '/volume           192.168.50.0/24(rw,sync,no_root_squash,no_subtree_check)'
+        line: '/volume  192.168.50.0/24(rw,sync,no_root_squash,no_subtree_check)'
 
     - name: Export volume
       command: exportfs -a
@@ -68,7 +68,7 @@
     - name: Initialize the Kubernetes cluster using kubeadm
       become: true
       command: >
-        kubeadm init --apiserver-advertise-address="192.168.50.210" --apiserver-cert-extra-sans="192.168.50.210"
+        kubeadm init --apiserver-advertise-address=192.168.50.210 --apiserver-cert-extra-sans=192.168.50.210
         --pod-network-cidr=100.64.0.0/16 --service-cidr=100.65.0.0/16
 
     - name: Generate join command
@@ -193,7 +193,7 @@
     - name: Install flannel
       command: "{{ item }}"
       with_items:
-        - kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml -f /tmp/kubernetes/flannel-values.yaml
+        - kubectl apply -f /tmp/kubernetes/kube-flannel.yaml -f /tmp/kubernetes/flannel-values.yaml
         - kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
 
     - name: Install Metal-LB
@@ -203,6 +203,6 @@
       command: kubectl apply -f /tmp/kubernetes/namespaces.yaml
 
     - name: Apply storage chart
-      command: helm install storage-nfs stable/nfs-client-provisioner  -f /tmp/kubernetes/nas-values.yaml
+      command: helm install storage-nfs stable/nfs-client-provisioner -f /tmp/kubernetes/nas-values.yaml
 
 
